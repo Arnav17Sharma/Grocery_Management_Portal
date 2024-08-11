@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> GSMS </title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="csrf-token" content="kmapods5wQ5L1hn7rcR9OPst7EsN0gC7SrHh3m9K"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,600,700">
+        <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}"> -->
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='custom.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='sidebar-menu.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <a href="{{ url_for('get_all_orders') }}">Orders</a>
+        <a href="{{ url_for('get_products') }}">Products</a>
+        <h1>Grocery Store Management System</h1>
+        <h2>Products</h2>
+        <h3> <a href="{{ url_for('insert_product') }}">ADD NEW PRODUCT</a></h2>
+        <form action="{{ url_for('delete_product') }}" method="POST">
+            <table>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>UOM unit</th>
+                    <th>Price per unit</th>
+                    <th>Action</th>
+                    <th>Confirm Action</th>
+                </tr>
+                {% for i in range(len) %}
+                <tr id="prodRow{{i+1}}">
+                    <td class="column-data">{{ response[i]['product_id'] }}</td>
+                    <td class="column-data">{{ response[i]['name'] }}</td>
+                    <td class="column-data">{{ response[i]['uom_name'] }}</td>
+                    <td class="column-data">{{ response[i]['price_per_unit'] }}</td>
+                    <td class="column-data"> <input type="button" id="deleteBtn" value="DELETE" class="del-btn"> </td>
+                    <td class="column-data"> <input type="submit" id="confirmBtn" value="CONFIRM" class="con-btn"> </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <p><input type="number" name="product_id" id="data"></p>
+        </form>
+    </body>
+    <script src="{{ url_for('static',filename='manage_product.js') }}"></script>
+</html>

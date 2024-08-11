@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> GSMS </title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="csrf-token" content="kmapods5wQ5L1hn7rcR9OPst7EsN0gC7SrHh3m9K"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,600,700">
+        <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}"> -->
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='custom.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='sidebar-menu.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <a href="{{ url_for('get_all_orders') }}">Orders</a>
+        <a href="{{ url_for('get_products') }}">Products</a>
+        <h1>Grocery Store Management System</h1>
+        <h2>Add New Product</h2>
+        <form action="{{ url_for('get_all_orders') }}" method="post">
+            <p>Customer Name: </p>
+            <p><input type="text" name="customer_name"></p>
+            <table>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>UOM unit</th>
+                    <th>Price per unit</th>
+                    <th>Add Action</th>
+                    <th>Remove Action</th>
+                    <th>Quantity Selected</th>
+                    <th>Total price</th>
+                </tr>
+                {% for i in range(len) %}
+                <tr class="rows" id="prodRow{{i+1}}">
+                    <td class = "column-data" id="prodID{{i+1}}">{{ response[i]['product_id'] }}</td>
+                    <td class = "column-data" id="prodName{{i+1}}">{{ response[i]['name'] }}</td>
+                    <td class = "column-data" id="uomName{{i+1}}">{{ response[i]['uom_name'] }}</td>
+                    <td class = "column-data" id="priceUnit{{i+1}}">{{ response[i]['price_per_unit'] }}</td>
+                    <td class = "column-data"> <input type = "button" value="ADD" class="add-inp"></input> </td>
+                    <td class = "column-data"> <input type = "button" value="REMOVE" class="remove-inp"></input> </td>
+                    <td class = "column-data"> 0 </td>
+                    <td class = "column-data total"> 0 </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <p>Grand Total: </p>
+            <p><input type="number" name="total" id="total"></p>
+            <p><input type="text" name="data" id="data"></p>
+            <p><input id="submitBtn" type="button" value="Submit" onclick="helper()"></p>
+            <p><input id="confirmBtn" type="submit" value="Confirm"></p>
+        </form>
+    </body>
+    <!-- <script src="{{ url_for('static',filename='jquery.min.js') }}"></script> -->
+    <script src="{{ url_for('static',filename='order.js') }}"></script>
+    <!-- <script src="{{ url_for('static',filename='dashboard.js') }}"></script> -->
+</html>
