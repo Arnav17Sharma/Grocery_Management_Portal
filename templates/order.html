@@ -1,116 +1,75 @@
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title> GSMS </title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <meta name="csrf-token" content="kmapods5wQ5L1hn7rcR9OPst7EsN0gC7SrHh3m9K"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,600,700">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='custom.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body class="tooltips">
-<div class="container">
+{% block header %}
+<h1 class="h2">Create New Order</h1>
+{% endblock %}
 
-    <div class="header content rows-content-header">
-        <button class="button-menu-mobile show-sidebar">
-            <i class="fa fa-bars"></i>
-        </button>
-        <div class="navbar navbar-default" role="navigation">
-            <div class="container">
-
-                <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav visible-lg visible-md limit-chars">
-                        <ul class="breadcrumb">
-                            <a href="{{ url_for('get_all_orders') }}">
-                                <i class="zmdi zmdi-view-dashboard zmdi-hc-fw" data-toggle="tooltip" data-placement="bottom" title="Dashboard"></i>
-                            </a>
-                            <a href="{{ url_for('get_products') }}">
-                                <i class="zmdi zmdi-assignment zmdi-hc-fw" data-toggle="tooltip" data-placement="bottom" title="Products"></i>
-                            </a>
-                        </ul>
-                    </ul>
-                </div>
+{% block content %}
+<form action="{{ url_for('insert_order') }}" method="POST">
+    <div class="card">
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="customerName" class="form-label">Customer Name</label>
+                <input name="customerName" id="customerName" type="text" class="form-control" placeholder="Enter Customer Name" required>
             </div>
         </div>
     </div>
 
-    <div class="right content-page">
-        <div class="body content rows scroll-y">
-            <form action="{{ url_for('insert_order') }}" method="POST">
-                <div class="box-info full" id="taskFormContainer">
-                    <h2>New Order
-                        <input name="customerName" id="customerName" type="text" class="form-control" placeholder="Customer Name" style="max-width:230px; float: right;margin-top: -11px">
-                    </h2>
-                    <div class="row" style="margin-bottom: 5px;margin-top: -10px;">
-                        <div class="col-sm-12">
-                            <div class="col-sm-4">
-                                <label >Product</label>
-                            </div>
-                            <div class="col-sm-3">
-                                <label >Price</label>
-                            </div>
-                            <div class="col-sm-2">
-                                <label >Quantity</label>
-                            </div>
-                            <div class="col-sm-3">
-                                <label >Total</label>
-                                <button class="btn btn-sm btn-primary pull-right" style="margin-top: -5px" type="button" id="addMoreButton">Add More</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="product-box-extra" id="itemsInOrder">
-
-                </div>
-                <div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="box-info full p-3 mb-3 mt-0">
-                                <div class="col-sm-9 text-right">
-                                    <span><b>Total</b></span>
-                                </div>
-                                <div class="col-sm-3">
-                                    <b><input id="product_grand_total" name="product_grand_total" class="product-grand-total" value="0.0"></input> Rs</b>
-                                    <button class="btn btn-sm btn-primary pull-right" type="button" id="saveOrder">Save</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-            <div class="product-box hidden">
-                <div class="row product-item">
-                    <div class="col-sm-12">
-                        <div class="box-info full p-3 mb-3 mt-0">
-                            <div class="col-sm-4">
-                                <select name="product" class="form-control cart-product" style="max-width: 250px"></select>
-                            </div>
-                            <div class="col-sm-3">
-                                <input id="product_price" name="product_price" class="product-price" value="0.0"></input>
-                            </div>
-                            <div class="col-sm-2">
-                                <input name="qty" type="number" min="1" placeholder="" class="form-control product-qty" value="1" style="max-width: 100px">
-                            </div>
-                            <div class="col-sm-3">
-                                <input id="item_total" name="item_total" class="product-total"></input><span> Rs</span>
-                                <button class="btn btn-sm btn-danger pull-right remove-row" type="button">Remove</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <div class="card mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Order Items</h5>
+            <button class="btn btn-sm btn-success" type="button" id="addMoreButton">
+                <i class="bi bi-plus-circle"></i> Add Item
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="row d-none d-md-flex mb-2">
+                <div class="col-md-4"><label>Product</label></div>
+                <div class="col-md-2"><label>Price</label></div>
+                <div class="col-md-2"><label>Quantity</label></div>
+                <div class="col-md-2"><label>Total</label></div>
             </div>
+            <div id="itemsInOrder">
+
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end align-items-center">
+            <h5 class="me-4 mb-0">Grand Total:</h5>
+            <div class="input-group" style="width: 200px;">
+                <input id="product_grand_total" name="product_grand_total" class="form-control text-end fw-bold" value="0.00" readonly>
+                <span class="input-group-text">Rs.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-end">
+        <a href="{{ url_for('get_all_orders') }}" class="btn btn-secondary">Cancel</a>
+        <button class="btn btn-primary" type="button" id="saveOrder">Save Order</button>
+    </div>
+</form>
+
+<div class="product-box hidden" style="display: none;">
+    <div class="row product-item mb-3 align-items-center">
+        <div class="col-md-4">
+            <select name="product" class="form-select cart-product"></select>
+        </div>
+        <div class="col-md-2">
+            <input id="product_price" name="product_price" class="form-control product-price" value="0.00" readonly>
+        </div>
+        <div class="col-md-2">
+            <input name="qty" type="number" min="1" class="form-control product-qty" value="1">
+        </div>
+        <div class="col-md-2">
+            <input id="item_total" name="item_total" class="form-control product-total" readonly>
+        </div>
+        <div class="col-md-2 text-end">
+            <button class="btn btn-sm btn-danger remove-row" type="button">Remove</button>
         </div>
     </div>
 </div>
-</body>
-<script src="{{ url_for('static',filename='jquery.min.js') }}"></script>
+{% endblock %}
+
+{% block scripts %}
 <script src="{{ url_for('static',filename='common.js') }}"></script>
 <script src="{{ url_for('static',filename='dashboard.js') }}"></script>
-<script src="{{ url_for('static',filename='bootstrap.min.js') }}"></script>
-</html>
+{% endblock %}

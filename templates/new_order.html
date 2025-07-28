@@ -1,59 +1,74 @@
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html>
-    <head>
-        <title> GSMS </title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-        <meta name="apple-mobile-web-app-capable" content="yes"/>
-        <meta name="csrf-token" content="kmapods5wQ5L1hn7rcR9OPst7EsN0gC7SrHh3m9K"/>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,300,600,700">
-        <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}"> -->
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='custom.css') }}">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='sidebar-menu.css') }}">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-    </head>
-    <body>
-        <a href="{{ url_for('get_all_orders') }}">Orders</a>
-        <a href="{{ url_for('get_products') }}">Products</a>
-        <h1>Grocery Store Management System</h1>
-        <h2>Add New Product</h2>
-        <form action="{{ url_for('get_all_orders') }}" method="post">
-            <p>Customer Name: </p>
-            <p><input type="text" name="customer_name"></p>
-            <table>
-                <tr>
-                    <th>Product ID</th>
-                    <th>Product Name</th>
-                    <th>UOM unit</th>
-                    <th>Price per unit</th>
-                    <th>Add Action</th>
-                    <th>Remove Action</th>
-                    <th>Quantity Selected</th>
-                    <th>Total price</th>
-                </tr>
-                {% for i in range(len) %}
-                <tr class="rows" id="prodRow{{i+1}}">
-                    <td class = "column-data" id="prodID{{i+1}}">{{ response[i]['product_id'] }}</td>
-                    <td class = "column-data" id="prodName{{i+1}}">{{ response[i]['name'] }}</td>
-                    <td class = "column-data" id="uomName{{i+1}}">{{ response[i]['uom_name'] }}</td>
-                    <td class = "column-data" id="priceUnit{{i+1}}">{{ response[i]['price_per_unit'] }}</td>
-                    <td class = "column-data"> <input type = "button" value="ADD" class="add-inp"></input> </td>
-                    <td class = "column-data"> <input type = "button" value="REMOVE" class="remove-inp"></input> </td>
-                    <td class = "column-data"> 0 </td>
-                    <td class = "column-data total"> 0 </td>
-                </tr>
-                {% endfor %}
-            </table>
-            <p>Grand Total: </p>
-            <p><input type="number" name="total" id="total"></p>
-            <p><input type="text" name="data" id="data"></p>
-            <p><input id="submitBtn" type="button" value="Submit" onclick="helper()"></p>
-            <p><input id="confirmBtn" type="submit" value="Confirm"></p>
-        </form>
-    </body>
-    <!-- <script src="{{ url_for('static',filename='jquery.min.js') }}"></script> -->
-    <script src="{{ url_for('static',filename='order.js') }}"></script>
-    <!-- <script src="{{ url_for('static',filename='dashboard.js') }}"></script> -->
-</html>
+{% block header %}
+<h1 class="h2">Create New Order</h1>
+{% endblock %}
+
+{% block content %}
+<form action="{{ url_for('get_all_orders') }}" method="post">
+    <div class="card">
+        <div class="card-header">
+            Customer Details
+        </div>
+        <div class="card-body">
+            <div class="mb-3" style="max-width: 400px;">
+                <label for="customer_name" class="form-label">Customer Name</label>
+                <input type="text" class="form-control" id="customer_name" name="customer_name" required>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            Select Products
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Product</th>
+                            <th scope="col">Price</th>
+                            <th scope="col" class="text-center" style="width: 15%;">Quantity</th>
+                            <th scope="col">Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-table-body">
+                        {% for i in range(len) %}
+                        <tr data-product-id="{{ response[i]['product_id'] }}">
+                            <td class="align-middle">{{ response[i]['product_id'] }}</td>
+                            <td class="align-middle">{{ response[i]['name'] }}</td>
+                            <td class="align-middle price-per-unit">{{ "%.2f"|format(response[i]['price_per_unit']) }}</td>
+                            <td class="text-center align-middle">
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-quantity" data-change="-1">-</button>
+                                <span class="quantity mx-2">0</span>
+                                <button type="button" class="btn btn-sm btn-outline-success btn-quantity" data-change="1">+</button>
+                            </td>
+                            <td class="align-middle item-total">0.00</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-body d-flex justify-content-end align-items-center">
+            <div class="me-4">
+                <h5 class="mb-0">Grand Total: <span id="grand-total" class="fw-bold">0.00</span> Rs.</h5>
+            </div>
+            <div>
+                <a href="{{ url_for('get_all_orders') }}" class="btn btn-secondary">Cancel</a>
+                <button id="confirmBtn" type="submit" class="btn btn-primary">Place Order</button>
+            </div>
+        </div>
+    </div>
+    
+    <input type="hidden" name="data" id="data">
+    <input type="hidden" name="total" id="total">
+</form>
+
+<script src="{{ url_for('static',filename='order.js') }}"></script>
+{% endblock %}

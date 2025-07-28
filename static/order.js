@@ -1,90 +1,77 @@
-let allButtons = document.getElementsByClassName('add-inp');
-let removeAllButtons = document.getElementsByClassName('remove-inp');
-let rows = document.querySelectorAll('.total')
-let rowList = document.querySelectorAll('.rows')
-let total = document.getElementById('total')
-let data = document.getElementById('data')
+document.addEventListener('DOMContentLoaded', function () {
+    // This object will hold the current state of our order
+    const orderState = [];
 
-
-for (let button of allButtons) {
-    button.addEventListener('click', () => {
-        let sum = 0
-        var clickedElement = event.target
-        var clickedRow = clickedElement.parentNode.parentNode.id;
-        var rowData = document.getElementById(clickedRow).querySelectorAll('.column-data');
-        // console.log(rowData)
-        let prodID = rowData[0].innerHTML
-        let prodName = rowData[1].innerHTML
-        let priceUnit = rowData[3].innerHTML
-        rowData[6].innerHTML = parseInt(rowData[6].innerHTML)+1
-        rowData[7].innerHTML = parseInt(rowData[6].innerHTML) * priceUnit
-        for(let i of rows){
-            sum += parseInt(i.innerHTML)
-        }
-        total.value = sum
-        console.log(prodID)
-        console.log(prodName)
-        console.log(priceUnit)
-        console.log(rowData[6].innerHTML)
-        console.log(rowData[7].innerHTML)
-    });
-}
-
-for (let button of removeAllButtons) {
-    button.addEventListener('click', () => {
-        let sum = 0
-        var clickedElement = event.target
-        var clickedRow = clickedElement.parentNode.parentNode.id;
-        var rowData = document.getElementById(clickedRow).querySelectorAll('.column-data')
-        // console.log(rowData)
-        let prodID = rowData[0].innerHTML
-        let prodName = rowData[1].innerHTML
-        let priceUnit = parseFloat(rowData[3].innerHTML)
-        rowData[6].innerHTML = Math.max(0, parseInt(rowData[6].innerHTML)-1)
-        rowData[7].innerHTML = parseInt(rowData[6].innerHTML) * priceUnit
-        for(let i of rows){
-            sum += parseInt(i.innerHTML)
-        }
-        total.value = sum
-        console.log(prodID)
-        console.log(prodName)
-        console.log(priceUnit)
-        console.log(rowData[6].innerHTML)
-        console.log(rowData[7].innerHTML)
-    });
-}
-
-let submitBtn = document.getElementById('submitBtn')
-
-function helper() {
-    let orderDetails = []
-    // console.log(rowList)
-    for(let row in rowList) {
-        if (!rowList.hasOwnProperty(row)) continue;
-        // console.log(typeof row)
-        // console.log(row)
-        productDetails = {}
-        // let rowID = parseInt(row)+1
-        // console.log(rowID)
-        // let rowData = document.getElementById('prodRow' + rowID)
-        let rowData = rowList[row].querySelectorAll('.column-data')
-        // console.log(parseInt(rowData[0].innerHTML))
-        let product_id = parseInt(rowData[0].innerHTML)
-        let quantity = parseInt(rowData[6].innerHTML)
-        let total_price = parseFloat(rowData[7].innerHTML)
-        // console.log(rowData)
-        productDetails.product_id = product_id
-        productDetails.quantity = quantity
-        productDetails.total_price = total_price
-        if(quantity != 0){orderDetails.push(productDetails)}
-        // console.log(productDetails)
+    // 1. INITIALIZE STATE from the HTML table
+    function initializeState() {
+        document.querySelectorAll('#order-table-body tr').forEach(row => {
+            const productId = parseInt(row.dataset.productId, 10);
+            const price = parseFloat(row.querySelector('.price-per-unit').innerText);
+            
+            if (!isNaN(productId)) {
+                orderState.push({
+                    id: productId,
+                    price: price,
+                    quantity: 0
+                });
+            }
+        });
     }
-    console.log(orderDetails)
-    data.value = JSON.stringify(orderDetails)
-    // return orderDetails
-    // $.ajax({
-    //     url: "/insertOrder",
-    //     type: "POST",
-    //     data: JSON.stringify({1:orderDetails})
-    // });
-}
+
+    // 2. RENDER FUNCTION: Updates the UI based on the current state
+    function render() {
+        let grandTotal = 0;
+
+        orderState.forEach(item => {
+            const row = document.querySelector(`tr[data-product-id='${item.id}']`);
+            if (row) {
+                const itemTotal = item.quantity * item.price;
+                grandTotal += itemTotal;
+
+                row.querySelector('.quantity').innerText = item.quantity;
+                row.querySelector('.item-total').innerText = itemTotal.toFixed(2);
+            }
+        });
+
+        // Update Grand Total in the UI
+        document.getElementById('grand-total').innerText = grandTotal.toFixed(2);
+
+        // Prepare data for form submission
+        const orderDetailsForSubmission = orderState
+            .filter(item => item.quantity > 0)
+            .map(item => ({
+                product_id: item.id,
+                quantity: item.quantity,
+                total_price: item.quantity * item.price
+            }));
+
+        // Update the hidden form inputs
+        document.getElementById('data').value = JSON.stringify(orderDetailsForSubmission);
+        document.getElementById('total').value = grandTotal;
+    }
+
+    // 3. EVENT LISTENER using Event Delegation
+    document.getElementById('order-table-body').addEventListener('click', function (event) {
+        // Check if a quantity button was clicked
+        const button = event.target.closest('.btn-quantity');
+        if (!button) return;
+
+        const row = event.target.closest('tr');
+        const productId = parseInt(row.dataset.productId, 10);
+        const change = parseInt(button.dataset.change, 10);
+
+        // Find the item in our state
+        const itemInState = orderState.find(item => item.id === productId);
+
+        if (itemInState) {
+            // Update the quantity in the state (ensuring it doesn't go below 0)
+            itemInState.quantity = Math.max(0, itemInState.quantity + change);
+            
+            // Re-render the UI
+            render();
+        }
+    });
+
+    // Run the initialization
+    initializeState();
+});
